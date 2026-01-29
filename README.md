@@ -4,7 +4,7 @@ A simple GPT-like transformer model implementation for text generation, built fr
 
 ## Features
 
-- Character-level tokenization
+- **Byte Pair Encoding (BPE)** tokenization - subword tokenization for better efficiency
 - Transformer architecture with multi-head attention
 - Training with TensorBoard logging
 - Text generation with temperature sampling
@@ -15,7 +15,8 @@ A simple GPT-like transformer model implementation for text generation, built fr
 ```
 .
 ├── model.py           # Transformer model implementation (SimpleGPT)
-├── tokenizer.py       # Character-level tokenization and dataset
+├── tokenizer.py       # BPE tokenization and dataset
+├── bpe_tokenizer.json # Saved BPE tokenizer (created after first run)
 ├── prepare_data.py    # Data cleaning and preparation
 ├── train.py          # Training script
 ├── generate.py       # Text generation script
@@ -60,7 +61,8 @@ python train.py
 ```
 
 The training script will:
-- Load and tokenize the cleaned dataset
+- Load and tokenize the cleaned dataset using BPE (or load existing tokenizer)
+- Train the BPE tokenizer if `bpe_tokenizer.json` doesn't exist (first run only)
 - Train the model for 5000 epochs (configurable)
 - Save model checkpoints every 500 epochs
 - Log training loss to TensorBoard
@@ -88,7 +90,7 @@ You can customize generation parameters:
 
 The model implements a simplified GPT architecture:
 
-- **Token Embedding**: Maps characters to dense vectors
+- **Token Embedding**: Maps BPE tokens to dense vectors
 - **Positional Embedding**: Adds positional information
 - **Transformer Blocks**: Stack of self-attention and feed-forward layers
 - **Output Head**: Linear layer for next-token prediction
@@ -107,12 +109,23 @@ The model implements a simplified GPT architecture:
 - PyTorch 2.0+
 - TensorBoard (for training visualization)
 
+## Tokenization
+
+This project uses **Byte Pair Encoding (BPE)** for tokenization:
+
+- **BPE** is a subword tokenization method that starts with character-level vocabulary and iteratively merges the most frequent pairs
+- More efficient than character-level (smaller sequences)
+- Better than word-level (handles out-of-vocabulary words)
+- The tokenizer is automatically trained on first run and saved to `bpe_tokenizer.json`
+- Default vocabulary size: 1000 tokens (configurable in `tokenizer.py`)
+
 ## Notes
 
-- The model uses character-level tokenization, which works well for smaller datasets
+- BPE tokenization provides a good balance between character and word-level approaches
 - Training time depends on dataset size and hardware (CPU/GPU)
 - Model checkpoints are saved periodically during training
 - The model automatically uses CUDA if available, otherwise falls back to CPU
+- BPE tokenizer is saved after training and reused on subsequent runs
 
 ## License
 
